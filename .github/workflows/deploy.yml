@@ -1,33 +1,40 @@
-name: Build and Deploy to Netlify
+name: CI-CD # Name of your workflow
 
 on:
   push:
     branches:
-      - main
+      - main # This workflow will run whenever code is pushed to the 'main' branch.
+            # Adjust to your deployment branch if it's different (e.g., 'master', 'production').
 
 jobs:
   build-and-deploy:
-    runs-on: ubuntu-latest
+    name: Build and Deploy to Netlify
+    runs-on: ubuntu-latest # Specifies the operating system for the job
 
     steps:
-    - name: Checkout source code
-      uses: actions/checkout@v3
+      - name: Checkout source code # Step to get your code from the repository
+        uses: actions/checkout@v4 # Use the latest version of the checkout action
 
-    - name: Setup Node.js environment
-      uses: actions/setup-node@v3
-      with:
-        node-version: '16'
+      - name: Setup Node.js environment # Step to set up Node.js
+        uses: actions/setup-node@v4 # Use the latest version of the setup-node action
+        with:
+          node-version: '18' # Specify the Node.js version you need for your React app.
+                             # You can use 'lts/*' for the latest LTS version or a specific number like '16', '20'.
 
-    - name: Install dependencies
-      run: npm install
+      - name: Install dependencies # Step to install your project's npm dependencies
+        run: npm install
 
-    - name: Build the React app
-      run: npm run build
+      - name: Build the React app # Step to build your React application
+        run: npm run build # This command runs the 'build' script defined in your package.json
 
-    - name: Deploy to Netlify
-      uses: nwtgck/actions-netlify@v1.2
-      with:
-        publish-dir: ./build
-        production-deploy: true
-        netlify-auth-token: ${{ secrets.NETLIFY_AUTH_TOKEN }}
-        netlify-site-id: ${{ secrets.NETLIFY_SITE_ID }}
+      - name: Deploy to Netlify # Step to deploy the built app to Netlify
+        uses: nwtgck/actions-netlify@v1.2 # Use the Netlify deploy action
+        with:
+          publish-dir: ./build # Directory containing the built files (e.g., 'build' for Create React App)
+          production-deploy: true # Set to true for production deployments (e.g., when pushing to 'main')
+          # The following inputs are *removed* because this action expects them as environment variables:
+          # netlify-auth-token: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          # netlify-site-id: ${{ secrets.NETLIFY_SITE_ID }}
+        env: # <--- CRITICAL CHANGE: Define environment variables for this step
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }} # Reference your GitHub secret
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}     # Reference your GitHub secret
