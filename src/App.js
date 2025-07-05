@@ -48,7 +48,7 @@ const App = () => {
   }
   return (
     <div className="container">
-      <h2>S3 File Uploader</h2>
+      <h2>S3 Files Uploader </h2>
 
       <input
         type="file"
